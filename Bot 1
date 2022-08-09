@@ -1,1 +1,19 @@
-hahahhaha
+from ev3dev2.sensor import Sensor, INPUT_1
+
+# Connect to the sensor
+infrared = Sensor(INPUT_1, driver_name="ht-nxt-ir-seek-v2")
+# Set the mode to what we want
+infrared.mode = "AC-ALL"
+
+# Gather information
+direction = infrared.value(0)
+very_left = infrared.value(1)
+slightly_left = infrared.value(2)
+middle = infrared.value(3)
+slightly_right = infrared.value(4)
+very_right = infrared.value(5)
+
+print(
+        f"Direction: {direction}.",
+    f"Sensor values: {very_left}, {slightly_left}, {middle}, {slightly_right}, {very_right}."
+    )
