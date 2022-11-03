@@ -1,9 +1,47 @@
-from ev3dev2.sensor import Sensor, INPUT_1
+#!/usr/bin/env python3
+
+#import time
+
+#from timeit import repeatm
+from ev3dev2.motor import LargeMotor, OUTPUT_A, OUTPUT_B, OUTPUT_C, OUTPUT_D
+from ev3dev2.sensor import Sensor, INPUT_1, INPUT_2 ,INPUT_3
 
 # Connect to the sensor
 infrared = Sensor(INPUT_1, driver_name="ht-nxt-ir-seek-v2")
-# Set the mode to what we want
+infrared2 = Sensor(INPUT_2, driver_name="ht-nxt-ir-seek-v2")
+compass = Sensor(INPUT_3, driver_name="ht-nxt-compass")
+#ultrasonic = Sensor(INPUT_4,driver_name="ht-nxt-ultrasonic" )
+Leftmotor = LargeMotor(OUTPUT_A)
+Rightmotor = LargeMotor(OUTPUT_B)
+Bottommotor = LargeMotor(OUTPUT_C)
+Topmotor = LargeMotor(OUTPUT_D)
+
+# Set the mode to what we
 infrared.mode = "AC-ALL"
+infrared2.mode = "AC-ALL"
+# 8-Direction Motor Movement
+#  1  2  3
+#  8  0  4
+#  7  6  5
+def motorDirection(direction):
+    if direction == 0:
+        return 0,0,0,0
+    elif direction == 1:
+        return -1,-1,0,0
+    elif direction == 2:
+        return -1,-1,-1,-1
+    elif direction == 3:
+        return 0,0,-1,-1
+    elif direction == 4:
+        return 1,1,-1,-1
+    elif direction == 5:
+        return 1,1,0,0
+    elif direction == 6:
+        return 1,1,1,1
+    elif direction == 7:
+        return 0,0,1,1
+    elif direction == 8:
+        return -1,-1,1,1
 
 # Gather information
 direction = infrared.value(0)
@@ -13,7 +51,90 @@ middle = infrared.value(3)
 slightly_right = infrared.value(4)
 very_right = infrared.value(5)
 
-print(
-        f"Direction: {direction}.",
-    f"Sensor values: {very_left}, {slightly_left}, {middle}, {slightly_right}, {very_right}."
-    )
+direction2 = infrared2.value(0)
+very_left2 = infrared2.value(1)
+slightly_left2 = infrared2.value(2)
+middle2 = infrared2.value (3)
+slightly_right2 = infrared2.value (4)
+very_right2 = infrared2.value (5)
+
+MaxReading = max([very_left, slightly_left,middle,slightly_right,very_right,very_left2,slightly_left2,middle2,slightly_right2,very_right2])
+
+
+
+"""""
+ultrasonic.comand = "BEGIN-CAL"
+ultrasonic.comand = "END-CAL"
+
+RightWall = ultrasonic.vaule()
+Botposition = 182 - RightWall
+"""
+# Calibrate the compass (Tell it what north is)
+compass.command = "BEGIN-CAL"
+compass.command = "END-CAL"
+
+Goal=compass.value()
+
+while True:
+    # This ranges from 0 to 359 (Clockwise rotation from starting position).
+    bearing = compass.value()
+    bearing -= Goal
+    if bearing < 0:
+        bearing += 360
+
+    if (infrared.value(0) in range(4, 7) and (bearing > 300 or bearing < 60)):
+        motorstuff = motorDirection(2)
+        Rightmotor.on(motorstuff[1] * 75)
+        Bottommotor.on(motorstuff[2] * 75)
+        Topmotor.on(motorstuff[3] * 75)
+        Leftmotor.on(motorstuff[0] * 75)
+
+    elif (infrared.value(0) in range(4, 7) and (bearing in range(180, 300))):
+        motorstuff = motorDirection(1)
+        Rightmotor.on(motorstuff[1] * 75)
+        Bottommotor.on(motorstuff[2] * 75)
+        Topmotor.on(motorstuff[3] * 75)
+        Leftmotor.on(motorstuff[0] * 75)
+
+    elif (infrared.value(0) in range(4, 7) and (bearing in range(60, 180))):
+        motorstuff = motorDirection(3)
+        Rightmotor.on(motorstuff[1] * 75)
+        Bottommotor.on(motorstuff[2] * 75)
+        Topmotor.on(motorstuff[3] * 75)
+        Leftmotor.on(motorstuff[0] * 75)
+
+    elif (infrared.value(0) < 4):
+        Rightmotor.on(-30)
+        Bottommotor.on(-30)
+        Topmotor.on(30)
+        Leftmotor.on(30)
+
+    elif (infrared.value(0) > 6):
+        Rightmotor.on(30)
+        Bottommotor.on(30)
+        Topmotor.on(-30)
+        Leftmotor.on(-30)
+
+        """
+    elif RightWall <25:
+        motorstuff = motorDirection(1)
+        Rightmotor.on(motorstuff[1] * 75)
+        Bottommotor.on(motorstuff[2] * 75)
+        Topmotor.on(motorstuff[3] * 75)
+        Leftmotor.on(motorstuff[0] * 75) 
+       
+    elif RightWall > 157:
+        motorstuff = motorDirection(3)
+        Rightmotor.on(motorstuff[1] * 75)
+        Bottommotor.on(motorstuff[2] * 75)
+        Topmotor.on(motorstuff[3] * 75)
+        Leftmotor.on(motorstuff[0] * 75)
+        """
+
+    if bearing > 180:
+        drift= 10
+
+    elif bearing < 180:
+        drift= 10
+
+    #time.sleep(0.1)
