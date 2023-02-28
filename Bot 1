@@ -61,14 +61,6 @@ very_right2 = infrared2.value (5)
 MaxReading = max([very_left, slightly_left,middle,slightly_right,very_right,very_left2,slightly_left2,middle2,slightly_right2,very_right2])
 
 
-
-"""""
-ultrasonic.comand = "BEGIN-CAL"
-ultrasonic.comand = "END-CAL"
-
-RightWall = ultrasonic.vaule()
-Botposition = 182 - RightWall
-"""
 # Calibrate the compass (Tell it what north is)
 compass.command = "BEGIN-CAL"
 compass.command = "END-CAL"
@@ -114,22 +106,6 @@ while True:
         Bottommotor.on(30)
         Topmotor.on(-30)
         Leftmotor.on(-30)
-
-        """
-    elif RightWall <25:
-        motorstuff = motorDirection(1)
-        Rightmotor.on(motorstuff[1] * 75)
-        Bottommotor.on(motorstuff[2] * 75)
-        Topmotor.on(motorstuff[3] * 75)
-        Leftmotor.on(motorstuff[0] * 75) 
-       
-    elif RightWall > 157:
-        motorstuff = motorDirection(3)
-        Rightmotor.on(motorstuff[1] * 75)
-        Bottommotor.on(motorstuff[2] * 75)
-        Topmotor.on(motorstuff[3] * 75)
-        Leftmotor.on(motorstuff[0] * 75)
-        """
 
     if bearing > 180:
         drift= 10
